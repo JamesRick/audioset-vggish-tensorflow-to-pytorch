@@ -1,3 +1,5 @@
+import os
+import torch
 import torch.nn as nn
 
 
@@ -49,6 +51,14 @@ class VGGish(nn.Module):
         x = self.fc(x)
         return x
 
+def get_model(pretrained=True):
+    pytorch_model = VGGish()
+
+    if pretrained:
+        chkpoint = '/home/rickjames/Documents/cs_8803/project/code/audio_goggles/goggles/torch_vggish/pytorch_vggish.pth'
+        pytorch_model.load_state_dict(torch.load(chkpoint))
+
+    return pytorch_model
 
 def main():
     pass
