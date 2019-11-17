@@ -38,6 +38,7 @@ def frame(data, window_length, hop_length):
     (N+1)-D np.array with as many rows as there are complete frames that can be
     extracted.
   """
+  
   num_samples = data.shape[0]
   num_frames = 1 + int(np.floor((num_samples - window_length) / hop_length))
   shape = (num_frames, window_length) + data.shape[1:]
@@ -64,6 +65,7 @@ def periodic_hann(window_length):
   Returns:
     A 1D np.array containing the periodic hann window.
   """
+  
   return 0.5 - (0.5 * np.cos(2 * np.pi / window_length *
                              np.arange(window_length)))
 
@@ -83,6 +85,7 @@ def stft_magnitude(signal, fft_length,
     2D np.array where each row contains the magnitudes of the fft_length/2+1
     unique values of the FFT for the corresponding frame of input samples.
   """
+  
   frames = frame(signal, window_length, hop_length)
   # Apply frame window to each frame. We use a periodic Hann (cosine of period
   # window_length) instead of the symmetric Hann of np.hanning (period
@@ -107,6 +110,7 @@ def hertz_to_mel(frequencies_hertz):
     Object of same size as frequencies_hertz containing corresponding values
     on the mel scale.
   """
+  
   return _MEL_HIGH_FREQUENCY_Q * np.log(
       1.0 + (frequencies_hertz / _MEL_BREAK_FREQUENCY_HERTZ))
 
@@ -152,6 +156,8 @@ def spectrogram_to_mel_matrix(num_mel_bins=20,
   Raises:
     ValueError: if frequency edges are incorrectly ordered or out of range.
   """
+  
+
   nyquist_hertz = audio_sample_rate / 2.
   if lower_edge_hertz < 0.0:
     raise ValueError("lower_edge_hertz %.1f must be >= 0" % lower_edge_hertz)
@@ -209,9 +215,11 @@ def log_mel_spectrogram(data,
     2D np.array of (num_frames, num_mel_bins) consisting of log mel filterbank
     magnitudes for successive frames.
   """
+  
   window_length_samples = int(round(audio_sample_rate * window_length_secs))
   hop_length_samples = int(round(audio_sample_rate * hop_length_secs))
   fft_length = 2 ** int(np.ceil(np.log(window_length_samples) / np.log(2.0)))
+  
   spectrogram = stft_magnitude(
       data,
       fft_length=fft_length,

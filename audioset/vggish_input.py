@@ -18,8 +18,11 @@
 import numpy as np
 import resampy
 
-from audioset import mel_features
-from audioset import vggish_params
+import goggles.torch_vggish.audioset.mel_features as mel_features
+# from audioset import mel_features
+
+import goggles.torch_vggish.audioset.vggish_params as vggish_params
+# from audioset import vggish_params
 
 import soundfile as sf
 
@@ -41,6 +44,7 @@ def waveform_to_examples(data, sample_rate):
     bands, where the frame length is vggish_params.STFT_HOP_LENGTH_SECONDS.
   """
   # Convert to mono.
+  
   if len(data.shape) > 1:
     data = np.mean(data, axis=1)
   # Resample to the rate assumed by VGGish.
@@ -68,7 +72,7 @@ def waveform_to_examples(data, sample_rate):
       log_mel,
       window_length=example_window_length,
       hop_length=example_hop_length)
-  return log_mel_examples
+  return log_mel_examples, log_mel
 
 
 def wavfile_to_examples(wav_file):
@@ -81,6 +85,7 @@ def wavfile_to_examples(wav_file):
   Returns:
     See waveform_to_examples.
   """
+  
   wav_data, sr = sf.read(wav_file, dtype='int16')
   assert wav_data.dtype == np.int16, 'Bad sample type: %r' % wav_data.dtype
   samples = wav_data / 32768.0  # Convert to [-1.0, +1.0]

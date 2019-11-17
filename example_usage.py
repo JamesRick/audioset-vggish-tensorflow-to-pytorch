@@ -7,7 +7,9 @@ from audioset import vggish_input, vggish_postprocess
 
 def main():
     # Initialize the PyTorch model.
-    device = 'cuda:0'
+    # device = 'cuda:0'
+    import pdb; pdb.set_trace()
+    device = 'cpu'
     pytorch_model = VGGish()
     pytorch_model.load_state_dict(torch.load('pytorch_vggish.pth'))
     pytorch_model = pytorch_model.to(device)
@@ -20,7 +22,7 @@ def main():
     x = np.sin(2 * np.pi * freq * t)
 
     # Produce a batch of log mel spectrogram examples.
-    input_batch = vggish_input.waveform_to_examples(x, sr)
+    input_batch = vggish_input.waveform_to_examples(x, sr)[0]
     input_batch = torch.from_numpy(input_batch).unsqueeze(dim=1)
     input_batch = input_batch.float().to(device)
 
