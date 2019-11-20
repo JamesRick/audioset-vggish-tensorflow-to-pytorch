@@ -25,7 +25,7 @@ import goggles.torch_vggish.audioset.vggish_params as vggish_params
 # from audioset import vggish_params
 
 import soundfile as sf
-
+import librosa as lb
 
 def waveform_to_examples(data, sample_rate):
   """Converts audio waveform into an array of examples for VGGish.
@@ -75,7 +75,7 @@ def waveform_to_examples(data, sample_rate):
   return log_mel_examples, log_mel
 
 
-def wavfile_to_examples(wav_file):
+def wavfile_to_examples(wav_file, trim_audio=False):
   """Convenience wrapper around waveform_to_examples() for a common WAV format.
 
   Args:
@@ -89,4 +89,13 @@ def wavfile_to_examples(wav_file):
   wav_data, sr = sf.read(wav_file, dtype='int16')
   assert wav_data.dtype == np.int16, 'Bad sample type: %r' % wav_data.dtype
   samples = wav_data / 32768.0  # Convert to [-1.0, +1.0]
+  if trim_audio:
+    # print("Trimming")
+    db_samples = lb.core.power_to_db(samples.astype(np.float32))
+    top_db = abs(db_samples.mean()) - (db_samples.std() / 1.0)
+    _, indices = lb.effects.trim(db_samples, top_db=top_db)
+    samples = samples[range(*indices)]
+    # print(lb.core.get_duration(samples, sr=sr))
+
   return waveform_to_examples(samples, sr)
+
