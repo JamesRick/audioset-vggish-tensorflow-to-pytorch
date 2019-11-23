@@ -55,8 +55,10 @@ def get_model(pretrained=True):
     pytorch_model = VGGish()
 
     if pretrained:
-        chkpoint = '/home/rickjames/Documents/cs_8803/project/code/audio_goggles/goggles/torch_vggish/pytorch_vggish.pth'
-        pytorch_model.load_state_dict(torch.load(chkpoint))
+        file_path = os.path.abspath(os.path.dirname(__file__))
+        path = os.path.abspath(os.path.join(file_path, "pytorch_vggish.pth"))
+        # chkpoint = '/home/rickjames/Documents/cs_8803/project/code/audio_goggles/goggles/torch_vggish/pytorch_vggish.pth'
+        pytorch_model.load_state_dict(torch.load(path))
 
     return pytorch_model
 
