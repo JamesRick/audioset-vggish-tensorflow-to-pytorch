@@ -17,6 +17,7 @@
 
 import numpy as np
 import resampy
+import time
 
 import goggles.torch_vggish.audioset.mel_features as mel_features
 # from audioset import mel_features
@@ -87,23 +88,30 @@ def wavfile_to_examples(wav_file, trim_audio=False):
     Returns:
     See waveform_to_examples.
     """
-    # import pdb; pdb.set_trace()
     wav_data, sr = sf.read(wav_file, dtype='int16')
+
     assert wav_data.dtype == np.int16, 'Bad sample type: %r' % wav_data.dtype
     samples = wav_data / 32768.0  # Convert to [-1.0, +1.0]
+    # convert to mono
+    if len(samples.shape) > 1:
+        samples = np.mean(samples, axis=1)
+
     if trim_audio:
-        # print("Trimming")
         db_samples = lb.core.power_to_db(samples.astype(np.float32))
         top_db = abs(db_samples.mean()) - (db_samples.std() / 1.0)
         _, indices = lb.effects.trim(db_samples, top_db=top_db)
+        cur_sample_size = samples.shape[0]
         samples = samples[range(*indices)]
+        new_sample_size = samples.shape[0]
         # print(lb.core.get_duration(samples, sr=sr))
-
     if samples.shape[0] < sr:
         if len(samples.shape) > 1:
             fill_zeros = np.zeros((sr - samples.shape[0], samples.shape[1]))
         else:
             fill_zeros = np.zeros((sr - samples.shape[0]))
         samples = np.concatenate((samples, fill_zeros))
+
+    if samples.shape[0] > sr * 10:
+        samples = samples[:int(sr*10)]
 
     return waveform_to_examples(samples, sr)
